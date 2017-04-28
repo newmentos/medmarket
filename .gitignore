@@ -3,3 +3,5 @@ backup/*
 arch/*
 pricecompare
 pricecompare.exe
+*.xls
+*.xlsx
