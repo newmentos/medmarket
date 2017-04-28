@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="10"/>
+    <BuildModes Active="Default"/>
+    <Units Count="1">
+      <Unit0>
+        <Filename Value="pricecompare.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="73"/>
+        <CursorPos X="42" Y="102"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit0>
+    </Units>
+    <JumpHistory Count="3" HistoryIndex="2">
+      <Position1>
+        <Filename Value="pricecompare.pas"/>
+        <Caret Line="97" Column="7" TopLine="63"/>
+      </Position1>
+      <Position2>
+        <Filename Value="pricecompare.pas"/>
+        <Caret Line="10" Column="12"/>
+      </Position2>
+      <Position3>
+        <Filename Value="pricecompare.pas"/>
+        <Caret Line="63" Column="54" TopLine="51"/>
+      </Position3>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>
