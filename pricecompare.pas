@@ -96,13 +96,31 @@ var
 
   procedure TPriceCompare.appendFile(fileName: string);
   var
-    MyWorkbook: TsWorkbook;
-    MyWorksheet: TsWorksheet;
+    i: integer;
+    InWorkbook, OutWorkbook: TsWorkbook;
+    InWorksheet, OutWorksheet: TsWorksheet;
+    productName, productManufact, productUnit: string;
+    productCost: Single;
   begin
     Writeln('Файл-' + fileName);
-    MyWorkbook := TsWorkbook.Create;
-    MyWorksheet := MyWorkbook.AddWorksheet('Compare result');
-    // read fileName and write to resFile
+    {
+    OutWorkbook := TsWorkbook.Create;
+    OutWorkbook.FileName := resFile;
+    OutWorksheet := MyWorkbook.AddWorksheet('Compare result');
+    }
+    InWorkbook := TsWorkbook.Create;
+    InWorkbook.ReadFromFile(fileName);
+    InWorksheet := InWorkbook.GetFirstWorksheet;
+    WriteLn(InWorksheet.GetLastRowIndex());
+    for i := 0 to InWorksheet.GetLastRowIndex() do
+    begin
+      productName := InWorksheet.ReadAsText(i, 0);
+      productManufact := InWorksheet.ReadAsText(i, 1);
+      productUnit := InWorksheet.ReadAsText(i, 2);
+      productCost := InWorksheet.ReadAsNumber(i, 3);
+      WriteLn(IntToStr(i) + ' ' + productName + ' ' + productManufact + ' ' +
+        productUnit + ' ' + FloatToStr(productCost));
+    end;
   end;
 
 

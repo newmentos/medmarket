@@ -8,13 +8,13 @@
         <Filename Value="pricecompare.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="73"/>
-        <CursorPos X="42" Y="102"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="94"/>
+        <CursorPos X="24" Y="103"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit0>
     </Units>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="9" HistoryIndex="8">
       <Position1>
         <Filename Value="pricecompare.pas"/>
         <Caret Line="97" Column="7" TopLine="63"/>
@@ -27,6 +27,30 @@
         <Filename Value="pricecompare.pas"/>
         <Caret Line="63" Column="54" TopLine="51"/>
       </Position3>
+      <Position4>
+        <Filename Value="pricecompare.pas"/>
+        <Caret Line="109" Column="23" TopLine="82"/>
+      </Position4>
+      <Position5>
+        <Filename Value="pricecompare.pas"/>
+        <Caret Line="115" Column="22" TopLine="87"/>
+      </Position5>
+      <Position6>
+        <Filename Value="pricecompare.pas"/>
+        <Caret Line="119" Column="21" TopLine="92"/>
+      </Position6>
+      <Position7>
+        <Filename Value="pricecompare.pas"/>
+        <Caret Line="122" Column="54" TopLine="91"/>
+      </Position7>
+      <Position8>
+        <Filename Value="pricecompare.pas"/>
+        <Caret Line="104" Column="23" TopLine="84"/>
+      </Position8>
+      <Position9>
+        <Filename Value="pricecompare.pas"/>
+        <Caret Line="103" Column="23" TopLine="84"/>
+      </Position9>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
