@@ -12,6 +12,11 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
 
 type
 
+  product = record
+    productName, productManufact, productUnit: string;
+    productCost: single;
+  end;
+
   { TPriceCompare }
 
   TPriceCompare = class(TCustomApplication)
@@ -21,7 +26,8 @@ type
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
     procedure WriteHelp; virtual;
-    procedure appendFile(fileName: string);
+    procedure parseFile(fileName: string);
+    procedure appendProduct(p: product);
   end;
 
   { TPriceCompare }
@@ -68,7 +74,7 @@ var
       begin
         if FileExists(ParamStr(i)) and (ParamCount > 1) then
         begin
-          appendFile(ParamStr(i));
+          parseFile(ParamStr(i));
         end;
       end;
     end;
@@ -94,35 +100,40 @@ var
     writeln('Usage: ', ExeName, ' -h');
   end;
 
-  procedure TPriceCompare.appendFile(fileName: string);
+  procedure TPriceCompare.parseFile(fileName: string);
   var
     i: integer;
-    InWorkbook, OutWorkbook: TsWorkbook;
-    InWorksheet, OutWorksheet: TsWorksheet;
-    productName, productManufact, productUnit: string;
-    productCost: Single;
+    InWorkbook: TsWorkbook;
+    InWorksheet: TsWorksheet;
+    p: product;
   begin
-    Writeln('Файл-' + fileName);
-    {
-    OutWorkbook := TsWorkbook.Create;
-    OutWorkbook.FileName := resFile;
-    OutWorksheet := MyWorkbook.AddWorksheet('Compare result');
-    }
+    Writeln('Читаем файл-' + fileName);
     InWorkbook := TsWorkbook.Create;
     InWorkbook.ReadFromFile(fileName);
     InWorksheet := InWorkbook.GetFirstWorksheet;
     WriteLn(InWorksheet.GetLastRowIndex());
     for i := 0 to InWorksheet.GetLastRowIndex() do
     begin
-      productName := InWorksheet.ReadAsText(i, 0);
-      productManufact := InWorksheet.ReadAsText(i, 1);
-      productUnit := InWorksheet.ReadAsText(i, 2);
-      productCost := InWorksheet.ReadAsNumber(i, 3);
-      WriteLn(IntToStr(i) + ' ' + productName + ' ' + productManufact + ' ' +
-        productUnit + ' ' + FloatToStr(productCost));
+      p.productName := InWorksheet.ReadAsText(i, 0);
+      p.productManufact := InWorksheet.ReadAsText(i, 1);
+      p.productUnit := InWorksheet.ReadAsText(i, 2);
+      p.productCost := InWorksheet.ReadAsNumber(i, 3);
+      appendProduct(p);
+      WriteLn('запись номер ' + IntToStr(i) + ' ' + p.productName +
+        ' ' + p.productManufact + ' ' + p.productUnit + ' ' + FloatToStr(p.productCost));
     end;
   end;
 
+  procedure TPriceCompare.appendProduct(p: product);
+  var
+    OutWorkbook: TsWorkbook;
+    OutWorksheet: TsWorksheet;
+    i: integer;
+  begin
+    OutWorkbook := TsWorkbook.Create;
+    OutWorksheet := OutWorkbook.AddWorksheet('Compare result');
+    OutWorkbook.WriteToFile(resFile);
+  end;
 
 begin
   Application := TPriceCompare.Create(nil);
