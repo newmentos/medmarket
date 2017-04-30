@@ -35,6 +35,12 @@ var
   Application: TPriceCompare;
   resFile: string;
 
+  procedure printProduct(const p: product; const i: integer);
+  begin
+    WriteLn('запись номер ' + IntToStr(i) + ' ' + p.productName +
+      ' ' + p.productManufact + ' ' + p.productUnit + ' ' + FloatToStr(p.productCost));
+  end;
+
   procedure TPriceCompare.DoRun;
   var
     ErrorMsg: string;
@@ -69,6 +75,8 @@ var
       Writeln(ParamStr(0));
       Writeln('Дополнительные параметры, переданные в программу:');
       resFile := ExtractFileDir(ParamStr(0)) + PathDelim + 'result.xls';
+      if FileExists(resFile) then
+        DeleteFile(resFile);
       Writeln('Результирующий файл ' + resFile);
       for i := 1 to ParamCount do
       begin
@@ -114,13 +122,15 @@ var
     WriteLn(InWorksheet.GetLastRowIndex());
     for i := 0 to InWorksheet.GetLastRowIndex() do
     begin
-      p.productName := InWorksheet.ReadAsText(i, 0);
-      p.productManufact := InWorksheet.ReadAsText(i, 1);
-      p.productUnit := InWorksheet.ReadAsText(i, 2);
-      p.productCost := InWorksheet.ReadAsNumber(i, 3);
+      with p do
+      begin
+        productName := InWorksheet.ReadAsText(i, 0);
+        productManufact := InWorksheet.ReadAsText(i, 1);
+        productUnit := InWorksheet.ReadAsText(i, 2);
+        productCost := InWorksheet.ReadAsNumber(i, 3);
+      end;
       appendProduct(p);
-      WriteLn('запись номер ' + IntToStr(i) + ' ' + p.productName +
-        ' ' + p.productManufact + ' ' + p.productUnit + ' ' + FloatToStr(p.productCost));
+      printProduct(p, i);
     end;
   end;
 
@@ -132,7 +142,7 @@ var
   begin
     OutWorkbook := TsWorkbook.Create;
     OutWorksheet := OutWorkbook.AddWorksheet('Compare result');
-    OutWorkbook.WriteToFile(resFile);
+//    OutWorkbook.WriteToFile(resFile);
   end;
 
 begin
