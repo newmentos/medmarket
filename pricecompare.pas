@@ -22,6 +22,8 @@ type
   TPriceCompare = class(TCustomApplication)
   protected
     procedure DoRun; override;
+    function searchEquality(p: product): integer;
+    function compare(p, pTmp: product): boolean;
   public
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
@@ -34,6 +36,11 @@ type
 var
   Application: TPriceCompare;
   resFile: string;
+  OutWorkbook: TsWorkbook;
+  OutWorksheet: TsWorksheet;
+  curRow, curColumn: integer;
+
+
 
   procedure printProduct(const p: product; const i: integer);
   begin
@@ -77,14 +84,20 @@ var
       resFile := ExtractFileDir(ParamStr(0)) + PathDelim + 'result.xls';
       if FileExists(resFile) then
         DeleteFile(resFile);
+      OutWorkbook := TsWorkbook.Create;
+      OutWorksheet := OutWorkbook.AddWorksheet('Compare result');
+      curRow := 0;
+      curColumn := 3;
       Writeln('Результирующий файл ' + resFile);
       for i := 1 to ParamCount do
       begin
         if FileExists(ParamStr(i)) and (ParamCount > 1) then
         begin
-          parseFile(ParamStr(i));
+          parseFile(ParamStr(i)); // Send file to parsing
+          curColumn += 1;
         end;
       end;
+      OutWorkbook.WriteToFile(resFile);
     end;
 
     // stop program loop
@@ -136,13 +149,53 @@ var
 
   procedure TPriceCompare.appendProduct(p: product);
   var
-    OutWorkbook: TsWorkbook;
-    OutWorksheet: TsWorksheet;
-    i: integer;
+    keyRow: integer;
   begin
-    OutWorkbook := TsWorkbook.Create;
-    OutWorksheet := OutWorkbook.AddWorksheet('Compare result');
-//    OutWorkbook.WriteToFile(resFile);
+    keyRow := searchEquality(p);
+    if (keyRow = 0) then
+    begin
+      curRow += 1;
+      with p do
+      begin
+        OutWorksheet.WriteText(curRow, 0, productName);
+        OutWorksheet.WriteText(curRow, 1, productManufact);
+        OutWorksheet.WriteText(curRow, 2, productUnit);
+        OutWorksheet.WriteCurrency(curRow, curColumn, FloattoCurr(productCost));
+      end;
+    end
+    else
+    begin
+      OutWorksheet.WriteCurrency(keyRow, curColumn, FloattoCurr(p.productCost));
+    end;
+  end;
+
+
+  function TPriceCompare.searchEquality(p: product): integer;
+  var
+    j: integer;
+    pTmp: product;
+  begin
+    searchEquality := 0;
+    for j := 1 to OutWorksheet.GetLastRowIndex() do
+    begin
+      with pTmp do
+      begin
+        productName := OutWorksheet.ReadAsText(j, 0);
+        productManufact := OutWorksheet.ReadAsText(j, 1);
+        productUnit := OutWorksheet.ReadAsText(j, 2);
+        productCost := OutWorksheet.ReadAsNumber(j, 3);
+      end;
+      if compare(p, pTmp) then
+      begin
+        searchEquality := j;
+        Break;
+      end;
+    end;
+  end;
+
+  function TPriceCompare.compare(p, pTmp: product): boolean;
+  begin
+    compare := True;
   end;
 
 begin
