@@ -86,15 +86,19 @@ var
         DeleteFile(resFile);
       OutWorkbook := TsWorkbook.Create;
       OutWorksheet := OutWorkbook.AddWorksheet('Compare result');
+      OutWorksheet.WriteText(0, 0, 'Наименование');
+      OutWorksheet.WriteText(0, 1, 'Производитель');
+      OutWorksheet.WriteText(0, 2, 'еденица измерения');
       curRow := 0;
       curColumn := 3;
       Writeln('Результирующий файл ' + resFile);
       for i := 1 to ParamCount do
       begin
-        if FileExists(ParamStr(i)) and (ParamCount > 1) then
+        if FileExists(ParamStr(i)) then
         begin
           parseFile(ParamStr(i)); // Send file to parsing
           curColumn += 1;
+          OutWorksheet.WriteText(0, 2 + i, ParamStr(i));
         end;
       end;
       OutWorkbook.WriteToFile(resFile);
@@ -117,7 +121,8 @@ var
 
   procedure TPriceCompare.WriteHelp;
   begin
-    { add your help code here }
+    WriteLn('Run', ExeName, ' file1.xls file2.xls ... filen.xls');
+    WriteLn('program generate file result.xls where compare cost of products');
     writeln('Usage: ', ExeName, ' -h');
   end;
 
@@ -175,8 +180,8 @@ var
     j: integer;
     pTmp: product;
   begin
-    searchEquality := 0;
-    for j := 1 to OutWorksheet.GetLastRowIndex() do
+    Result := 0;
+    for j := 1 to curRow do
     begin
       with pTmp do
       begin
@@ -187,7 +192,7 @@ var
       end;
       if compare(p, pTmp) then
       begin
-        searchEquality := j;
+        Result := j;
         Break;
       end;
     end;
@@ -195,7 +200,10 @@ var
 
   function TPriceCompare.compare(p, pTmp: product): boolean;
   begin
-    compare := True;
+    Result := False;
+    if (Trim(UpperCase(p.productName)) = Trim(UpperCase(pTmp.productName))) and (Trim(UpperCase(p.productManufact)) =
+      Trim(UpperCase(p.productManufact))) then
+      Result := True;
   end;
 
 begin
