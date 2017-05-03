@@ -9,7 +9,8 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   CustApp,
   fpspreadsheet,
   laz_fpspreadsheet,
-  Math { you can add units after this };
+  Math,
+  Crt { you can add units after this };
 
 type
 
@@ -216,20 +217,16 @@ var
     lev2 := CompareStrings_Levenshtein(s2, s2Tmp, False);
     ratcl1 := CompareStrings_Ratcliff(s1, s1Tmp, False);
     ratcl2 := CompareStrings_Ratcliff(s2, s2Tmp, False);
+    WriteLn(s1);
+    WriteLn(s1Tmp);
+    WriteLn('Levenshtein=' + IntToStr(lev1) + #9 + 'Ratcliff=' + FloatToStr(ratcl1));
+    WriteLn();
+    WriteLn(s2);
+    WriteLn(s2Tmp);
+    WriteLn('Levenshtein=' + IntToStr(lev2) + #9 + 'Ratcliff=' + FloatToStr(ratcl2));
+    ReadLn;
     if (s1 = s1Tmp) and (s2 = s2Tmp) then
     begin
-      {
-      WriteLn(s1 + ' ' + s1Tmp + ' Levenshtein=' + IntToStr(lev1) +
-        ' Ratcliff=' + FloatToStr(ratcl1));
-      WriteLn(s2 + ' ' + s2Tmp + ' Levenshtein=' + IntToStr(lev2) +
-        ' Ratcliff=' + FloatToStr(ratcl2));
-      WriteLn();
-      Write('Сравнивали ');
-      printProduct(p);
-      Write(' и ');
-      printProduct(pTmp);
-      WriteLn();
-            }
       Result := True;
     end
     else
