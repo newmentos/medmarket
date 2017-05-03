@@ -8,7 +8,8 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   SysUtils,
   CustApp,
   fpspreadsheet,
-  laz_fpspreadsheet { you can add units after this };
+  laz_fpspreadsheet,
+  Math { you can add units after this };
 
 type
 
@@ -201,9 +202,134 @@ var
   function TPriceCompare.compare(p, pTmp: product): boolean;
   begin
     Result := False;
-    if (Trim(UpperCase(p.productName)) = Trim(UpperCase(pTmp.productName))) and (Trim(UpperCase(p.productManufact)) =
-      Trim(UpperCase(p.productManufact))) then
+    if (Trim(UpperCase(p.productName)) = Trim(UpperCase(pTmp.productName))) and
+      (Trim(UpperCase(p.productManufact)) = Trim(UpperCase(p.productManufact))) then
       Result := True;
+  end;
+
+
+  // функции взяты отсюда http://www.delphigroups.info/2/25/422444.html  (John Leavey )
+  function CompareStrings_Levenshtein(const A, B: string;
+    CaseSensitive: boolean = False): integer;
+
+    function Minimum3(x, y, z: integer): integer;
+    begin
+      Result := Min(x, y);
+      Result := Min(Result, z);
+    end;
+
+  var
+    D: array of array of integer;
+    n, m, i, j, Cost: integer;
+    AI, BJ: char;
+    A1, B1: string;
+  begin
+    n := Length(A);
+    m := Length(B);
+    if (n = 0) then
+      Result := m
+    else if m = 0 then
+      Result := n
+    else
+    begin
+      if CaseSensitive then
+        A1 := A
+      else
+        A1 := UpperCase(A);
+      if CaseSensitive then
+        B1 := B
+      else
+        B1 := UpperCase(B);
+      Setlength(D, n + 1, m + 1);
+      for i := 0 to n do
+        D[i, 0] := i;
+      for j := 0 to m do
+        D[0, j] := j;
+      for i := 1 to n do
+      begin
+        AI := A1[i];
+        for j := 1 to m do
+        begin
+          BJ := B1[j];
+          //  Cost := iff(AI = BJ, 0, 1);
+          if (AI = BJ) then
+            Cost := 0
+          else
+            Cost := 1;
+          D[i, j] := Minimum3(D[i - 1][j] + 1, D[i][j - 1] + 1,
+            D[i - 1][j - 1] + Cost);
+        end;
+      end;
+      Result := D[n, m];
+    end;
+  end;
+
+  function CompareStrings_Ratcliff(const A, B: string;
+    CaseSensitive: boolean = False): double;
+  var
+    A1, B1: string;
+    LenA, LenB: integer;
+
+    function CSRSub(StartA, EndA, StartB, EndB: integer): integer;
+    var
+      ai, bi, i, Matches, NewStartA, NewStartB: integer;
+    begin
+      Result := 0;
+      NewStartA := 0;
+      NewStartB := 0;
+      if (StartA > EndA) or (StartB > EndB) or (StartA <= 0) or (StartB <= 0) then
+        Exit;
+      for ai := StartA to EndA do
+      begin
+        for bi := StartB to EndB do
+        begin
+          Matches := 0;
+          i := 0;
+          while (ai + i <= EndA) and (bi + i <= EndB) and
+            (A1[ai + i] = B1[bi + i]) do
+          begin
+            Inc(Matches);
+            if Matches > Result then
+            begin
+              NewStartA := ai;
+              NewStartB := bi;
+              Result := Matches;
+            end;
+            Inc(i);
+          end;
+        end;
+      end;
+      if Result > 0 then
+      begin
+        Inc(Result, CSRSub(NewStartA + Result, EndA, NewStartB + Result, EndB));
+        Inc(Result, CSRSub(StartA, NewStartA - 1, StartB, NewStartB - 1));
+      end;
+    end;
+
+  begin
+
+
+
+
+
+
+
+    if CaseSensitive then
+      A1 := A
+    else
+      A1 := UpperCase(A);
+    if CaseSensitive then
+      B1 := B
+    else
+      B1 := UpperCase(B);
+    LenA := Length(A1);
+    LenB := Length(B1);
+    if A1 = B1 then
+      Result := 100
+    else if (LenA = 0) or (LenB = 0) then
+      Result := 0
+    else
+      Result := CSRSub(1, LenA, 1, LenB) * 200 / (LenA + LenB);
   end;
 
 begin
