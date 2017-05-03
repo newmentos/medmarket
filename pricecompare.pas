@@ -25,6 +25,10 @@ type
     procedure DoRun; override;
     function searchEquality(p: product): integer;
     function compare(p, pTmp: product): boolean;
+    function CompareStrings_Levenshtein(const A, B: string;
+      CaseSensitive: boolean = False): integer;
+    function CompareStrings_Ratcliff(const A, B: string;
+      CaseSensitive: boolean = False): double;
   public
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
@@ -41,12 +45,10 @@ var
   OutWorksheet: TsWorksheet;
   curRow, curColumn: integer;
 
-
-
-  procedure printProduct(const p: product; const i: integer);
+  procedure printProduct(const p: product);
   begin
-    WriteLn('запись номер ' + IntToStr(i) + ' ' + p.productName +
-      ' ' + p.productManufact + ' ' + p.productUnit + ' ' + FloatToStr(p.productCost));
+    Write(p.productName + ' ' + p.productManufact + ' ' + p.productUnit +
+      ' ' + FloatToStr(p.productCost));
   end;
 
   procedure TPriceCompare.DoRun;
@@ -149,7 +151,7 @@ var
         productCost := InWorksheet.ReadAsNumber(i, 3);
       end;
       appendProduct(p);
-      printProduct(p, i);
+      //      printProduct(p);
     end;
   end;
 
@@ -200,16 +202,43 @@ var
   end;
 
   function TPriceCompare.compare(p, pTmp: product): boolean;
+  var
+    s1, s1Tmp, s2, s2Tmp: string;
+    lev1, lev2: integer;
+    ratcl1, ratcl2: double;
   begin
+    s1 := Trim(UpperCase(p.productName));
+    s1Tmp := Trim(UpperCase(pTmp.productName));
+    s2 := Trim(UpperCase(p.productManufact));
+    s2Tmp := Trim(UpperCase(p.productManufact));
     Result := False;
-    if (Trim(UpperCase(p.productName)) = Trim(UpperCase(pTmp.productName))) and
-      (Trim(UpperCase(p.productManufact)) = Trim(UpperCase(p.productManufact))) then
+    lev1 := CompareStrings_Levenshtein(s1, s1Tmp, False);
+    lev2 := CompareStrings_Levenshtein(s2, s2Tmp, False);
+    ratcl1 := CompareStrings_Ratcliff(s1, s1Tmp, False);
+    ratcl2 := CompareStrings_Ratcliff(s2, s2Tmp, False);
+    if (s1 = s1Tmp) and (s2 = s2Tmp) then
+    begin
+      {
+      WriteLn(s1 + ' ' + s1Tmp + ' Levenshtein=' + IntToStr(lev1) +
+        ' Ratcliff=' + FloatToStr(ratcl1));
+      WriteLn(s2 + ' ' + s2Tmp + ' Levenshtein=' + IntToStr(lev2) +
+        ' Ratcliff=' + FloatToStr(ratcl2));
+      WriteLn();
+      Write('Сравнивали ');
+      printProduct(p);
+      Write(' и ');
+      printProduct(pTmp);
+      WriteLn();
+            }
       Result := True;
+    end
+    else
+      Result := False;
   end;
 
 
   // функции взяты отсюда http://www.delphigroups.info/2/25/422444.html  (John Leavey )
-  function CompareStrings_Levenshtein(const A, B: string;
+  function TPriceCompare.CompareStrings_Levenshtein(const A, B: string;
     CaseSensitive: boolean = False): integer;
 
     function Minimum3(x, y, z: integer): integer;
@@ -264,7 +293,7 @@ var
     end;
   end;
 
-  function CompareStrings_Ratcliff(const A, B: string;
+  function TPriceCompare.CompareStrings_Ratcliff(const A, B: string;
     CaseSensitive: boolean = False): double;
   var
     A1, B1: string;
@@ -307,13 +336,6 @@ var
     end;
 
   begin
-
-
-
-
-
-
-
     if CaseSensitive then
       A1 := A
     else
